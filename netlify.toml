@@ -5,13 +5,9 @@
 [build.environment]
   NODE_VERSION = "20"
 
-[[redirects]]
-  from = "/admin/*"
-  to = "/admin/:splat"
-  status = 200
-
-# Netlify Functions are accessed via /.netlify/functions/function-name
-# Next.js handles all other routes
+# Netlify Next.js plugin for proper routing and SSR
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
 
 [functions]
   node_bundler = "esbuild"
