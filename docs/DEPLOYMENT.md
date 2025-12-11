@@ -87,22 +87,27 @@ Netlify should auto-detect Next.js. Verify these settings:
 
 ### 3.3 Set Environment Variables
 
-In Netlify dashboard → **Site settings** → **Environment variables**, add:
+**CRITICAL**: These environment variables MUST be set in Netlify before building, as Next.js needs them during the build process.
 
-**Public variables** (exposed to client):
+In Netlify dashboard → **Site settings** → **Environment variables** → **Edit variables**, add:
+
+**Public variables** (exposed to client - required for build):
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-**Private variables** (server-only):
+**Private variables** (server-only - required for Netlify Functions):
 ```
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 OPENAI_API_KEY=sk-your-openai-key
 PGVECTOR_DIMENSION=1536
 ```
 
-⚠️ **Important**: Never commit service role keys or API keys to Git!
+⚠️ **Important**: 
+- Never commit service role keys or API keys to Git!
+- These variables must be set BEFORE the first build, otherwise the build will fail
+- After adding variables, trigger a new deploy
 
 ### 3.4 Deploy
 
