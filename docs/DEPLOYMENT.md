@@ -79,11 +79,13 @@ This creates:
 
 ### 3.2 Configure Build Settings
 
-Netlify should auto-detect Next.js. Verify these settings:
+Netlify should auto-detect Next.js. The `netlify.toml` is already configured, but verify these settings in Netlify UI:
 
 - **Build command**: `cd app/storefront && npm install && npm run build`
 - **Publish directory**: `app/storefront/.next`
-- **Base directory**: (leave empty)
+- **Base directory**: `.` (root of repository)
+
+**Important**: The Netlify Next.js plugin (`@netlify/plugin-nextjs`) is configured in `netlify.toml` and will be automatically installed during build. This plugin is required for proper Next.js routing on Netlify.
 
 ### 3.3 Set Environment Variables
 
