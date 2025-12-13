@@ -1,0 +1,236 @@
+# ================================
+# Cursor Rules for Hush Gentle
+# Full-Stack E-Commerce Platform
+# ================================
+
+version: 1.0
+
+project:
+  name: hush-gentle-ecommerce
+  domain: organic-cosmetics
+  stage: production-mvp
+  principles:
+    - low-maintenance
+    - security-first
+    - minimalistic-ui
+    - founder-friendly
+    - scalable-without-refactor
+
+# --------------------------------
+# GLOBAL EXECUTION RULES
+# --------------------------------
+global:
+  max_mode: true
+  allow_auto_model_switching: false
+  use_multiple_models: true
+  enforce_stepwise_execution: true
+  no_hallucinated_dependencies: true
+  prefer_explicit_over_implicit: true
+  avoid_overengineering: true
+
+  mandatory_output_order:
+    - architecture
+    - file_structure
+    - database_schema
+    - backend_logic
+    - frontend_components
+    - admin_dashboard
+    - analytics
+    - ai_chatbot
+    - security_review
+    - setup_instructions
+
+# --------------------------------
+# MODEL ROLE ASSIGNMENTS
+# --------------------------------
+models:
+
+  architect:
+    model: GPT-5.2
+    responsibilities:
+      - system_architecture
+      - database_schema_design
+      - supabase_rls_policies
+      - authentication_flows
+      - analytics_strategy
+      - payment_abstraction_design
+    constraints:
+      - must_reason_before_code
+      - must_define_tradeoffs
+      - no_ui_code
+      - no_placeholder_logic
+    output_style:
+      verbosity: high
+      format: markdown
+      include_diagrams: true
+
+  builder:
+    model: GPT-5.1 Codex Max
+    responsibilities:
+      - nextjs_app_router
+      - api_routes
+      - server_actions
+      - supabase_queries
+      - typescript_types
+      - backend_validation
+    constraints:
+      - follow_architect_decisions
+      - no_schema_changes_without_approval
+      - strict_typescript
+      - no_experimental_nextjs_features
+    output_style:
+      verbosity: medium
+      format: code-first
+      tests: optional
+
+  designer:
+    model: Claude Opus 4.5
+    responsibilities:
+      - react_components
+      - tailwind_css
+      - ui_layout
+      - accessibility_basics
+      - microcopy
+      - branding_tone
+    constraints:
+      - no_backend_logic
+      - no_database_access
+      - follow_design_tokens
+      - pastel_palette_only
+    output_style:
+      verbosity: medium
+      format: jsx-tsx
+      focus: aesthetics
+
+  orchestrator:
+    model: Composer 1
+    responsibilities:
+      - task_decomposition
+      - agent_coordination
+      - consistency_checks
+      - conflict_resolution
+      - step_progression
+    constraints:
+      - must_assign_tasks_explicitly
+      - must_validate_outputs
+      - stop_if_requirements_conflict
+    output_style:
+      verbosity: low
+      format: checklist
+
+# --------------------------------
+# FRONTEND RULES
+# --------------------------------
+frontend:
+  framework: react
+  router: nextjs-app-router
+  styling: tailwindcss
+  ui_principles:
+    - high_whitespace
+    - calm_interactions
+    - minimal_motion
+    - mobile_first
+    - accessible_contrast
+  forbidden:
+    - inline_css
+    - heavy_animation_libraries
+    - unnecessary_client_components
+
+# --------------------------------
+# BACKEND RULES
+# --------------------------------
+backend:
+  framework: nextjs
+  api_style: route_handlers
+  auth: supabase_auth
+  rules:
+    - all_routes_authenticated_by_default
+    - admin_routes_role_protected
+    - validate_all_inputs
+    - no_business_logic_in_components
+
+# --------------------------------
+# DATABASE RULES
+# --------------------------------
+database:
+  provider: supabase
+  engine: postgresql
+  rules:
+    - rls_enabled_on_all_tables
+    - indexes_on_foreign_keys
+    - no_denormalization_without_reason
+    - audit_fields_required
+  mandatory_tables:
+    - users
+    - profiles
+    - products
+    - categories
+    - carts
+    - cart_items
+    - wishlists
+    - orders
+    - order_items
+    - payments
+    - testimonials
+    - amazon_reviews
+    - analytics_events
+    - chatbot_sessions
+    - chatbot_messages
+
+# --------------------------------
+# AI CHATBOT RULES
+# --------------------------------
+ai_chatbot:
+  personality:
+    tone: gentle
+    style: calm
+    avoid:
+      - medical_claims
+      - aggressive_sales
+  requirements:
+    - provider_agnostic
+    - configurable_system_prompt
+    - conversation_logging
+    - graceful_fallbacks
+
+# --------------------------------
+# ANALYTICS RULES
+# --------------------------------
+analytics:
+  strategy: internal_events
+  rules:
+    - no_third_party_paid_tools
+    - event_based_tracking
+    - daily_aggregation
+    - admin_visualization_ready
+
+# --------------------------------
+# SECURITY RULES
+# --------------------------------
+security:
+  principles:
+    - least_privilege
+    - zero_trust
+    - secure_defaults
+  mandatory:
+    - rls_policies
+    - admin_role_checks
+    - server_side_validation
+    - no_secrets_in_client
+  forbidden:
+    - client_side_auth_logic
+    - public_admin_routes
+
+# --------------------------------
+# FAILURE CONDITIONS
+# --------------------------------
+failure_conditions:
+  - skipping_architecture_phase
+  - modifying_schema_without_architect
+  - mixing_ui_and_backend_logic
+  - hallucinated_integrations
+  - violating_brand_tone
+
+# ================================
+# END OF CURSOR RULES
+# ================================
