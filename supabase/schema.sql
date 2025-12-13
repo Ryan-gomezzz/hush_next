@@ -1,20 +1,10 @@
 -- Hush Gentle Ecommerce - Supabase/Postgres Schema (public)
--- Requirements:
--- - RLS enabled on ALL tables
--- - Foreign keys + indexes on relations
--- - Audit columns on all tables
--- Notes:
--- - Supabase Auth users live in auth.users. We keep a minimal public.users table
---   referencing auth.users to satisfy app-level requirements and support RLS.
+-- This file intentionally mirrors `db/schema.sql` so Supabase dashboard setup
+-- can point to `supabase/schema.sql` (SQL Editor does not support `\i`).
 
 begin;
 
--- Extensions (safe if already enabled)
 create extension if not exists "uuid-ossp";
-
--- ---------------------------------------------------------------------------
--- Helpers
--- ---------------------------------------------------------------------------
 
 create or replace function public.set_updated_at()
 returns trigger
@@ -38,10 +28,6 @@ as $$
       and p.role = 'admin'
   );
 $$;
-
--- ---------------------------------------------------------------------------
--- Core identity tables
--- ---------------------------------------------------------------------------
 
 create table if not exists public.users (
   id uuid primary key references auth.users(id) on delete cascade,
@@ -68,10 +54,6 @@ create index if not exists idx_profiles_role on public.profiles(role);
 create trigger trg_profiles_updated_at
 before update on public.profiles
 for each row execute function public.set_updated_at();
-
--- ---------------------------------------------------------------------------
--- Catalog
--- ---------------------------------------------------------------------------
 
 create table if not exists public.categories (
   id uuid primary key default uuid_generate_v4(),
@@ -109,10 +91,6 @@ create index if not exists idx_products_is_active on public.products(is_active);
 create trigger trg_products_updated_at
 before update on public.products
 for each row execute function public.set_updated_at();
-
--- ---------------------------------------------------------------------------
--- Cart + wishlist
--- ---------------------------------------------------------------------------
 
 create table if not exists public.carts (
   id uuid primary key default uuid_generate_v4(),
@@ -177,10 +155,6 @@ create trigger trg_wishlist_items_updated_at
 before update on public.wishlist_items
 for each row execute function public.set_updated_at();
 
--- ---------------------------------------------------------------------------
--- Orders + payments
--- ---------------------------------------------------------------------------
-
 create table if not exists public.orders (
   id uuid primary key default uuid_generate_v4(),
   user_id uuid not null references public.users(id) on delete restrict,
@@ -236,10 +210,6 @@ create trigger trg_payments_updated_at
 before update on public.payments
 for each row execute function public.set_updated_at();
 
--- ---------------------------------------------------------------------------
--- Social proof
--- ---------------------------------------------------------------------------
-
 create table if not exists public.testimonials (
   id uuid primary key default uuid_generate_v4(),
   name text not null,
@@ -274,10 +244,6 @@ create trigger trg_amazon_reviews_updated_at
 before update on public.amazon_reviews
 for each row execute function public.set_updated_at();
 
--- ---------------------------------------------------------------------------
--- Analytics
--- ---------------------------------------------------------------------------
-
 create table if not exists public.analytics_events (
   id uuid primary key default uuid_generate_v4(),
   user_id uuid references public.users(id) on delete set null,
@@ -291,10 +257,6 @@ create table if not exists public.analytics_events (
 create index if not exists idx_analytics_events_created_at on public.analytics_events(created_at);
 create index if not exists idx_analytics_events_event_name on public.analytics_events(event_name);
 create index if not exists idx_analytics_events_user_id on public.analytics_events(user_id);
-
--- ---------------------------------------------------------------------------
--- Chatbot (logging)
--- ---------------------------------------------------------------------------
 
 create table if not exists public.chatbot_sessions (
   id uuid primary key default uuid_generate_v4(),
@@ -324,10 +286,6 @@ create table if not exists public.chatbot_messages (
 create index if not exists idx_chatbot_messages_session_id on public.chatbot_messages(session_id);
 create index if not exists idx_chatbot_messages_created_at on public.chatbot_messages(created_at);
 
--- ---------------------------------------------------------------------------
--- Row Level Security (RLS)
--- ---------------------------------------------------------------------------
-
 alter table public.users enable row level security;
 alter table public.profiles enable row level security;
 alter table public.categories enable row level security;
@@ -345,7 +303,6 @@ alter table public.analytics_events enable row level security;
 alter table public.chatbot_sessions enable row level security;
 alter table public.chatbot_messages enable row level security;
 
--- Users
 drop policy if exists "users_select_self" on public.users;
 create policy "users_select_self" on public.users
 for select
@@ -362,7 +319,6 @@ for update
 using (id = auth.uid() or public.is_admin())
 with check (id = auth.uid() or public.is_admin());
 
--- Profiles
 drop policy if exists "profiles_select_self_or_admin" on public.profiles;
 create policy "profiles_select_self_or_admin" on public.profiles
 for select
@@ -379,7 +335,6 @@ for update
 using (id = auth.uid() or public.is_admin())
 with check (id = auth.uid() or public.is_admin());
 
--- Categories / Products: public read, admin write
 drop policy if exists "categories_public_read" on public.categories;
 create policy "categories_public_read" on public.categories
 for select using (true);
@@ -400,14 +355,12 @@ for all
 using (public.is_admin())
 with check (public.is_admin());
 
--- Carts: owner or admin
 drop policy if exists "carts_owner_access" on public.carts;
 create policy "carts_owner_access" on public.carts
 for all
 using (user_id = auth.uid() or public.is_admin())
 with check (user_id = auth.uid() or public.is_admin());
 
--- Cart items: via cart ownership
 drop policy if exists "cart_items_owner_access" on public.cart_items;
 create policy "cart_items_owner_access" on public.cart_items
 for all
@@ -426,14 +379,12 @@ with check (
   )
 );
 
--- Wishlists: owner or admin
 drop policy if exists "wishlists_owner_access" on public.wishlists;
 create policy "wishlists_owner_access" on public.wishlists
 for all
 using (user_id = auth.uid() or public.is_admin())
 with check (user_id = auth.uid() or public.is_admin());
 
--- Wishlist items: via wishlist ownership
 drop policy if exists "wishlist_items_owner_access" on public.wishlist_items;
 create policy "wishlist_items_owner_access" on public.wishlist_items
 for all
@@ -452,7 +403,6 @@ with check (
   )
 );
 
--- Orders: owner or admin (immutable-ish from client; still allow updates via server using service role)
 drop policy if exists "orders_owner_read" on public.orders;
 create policy "orders_owner_read" on public.orders
 for select
@@ -469,7 +419,6 @@ for update
 using (user_id = auth.uid() or public.is_admin())
 with check (user_id = auth.uid() or public.is_admin());
 
--- Order items: via order ownership
 drop policy if exists "order_items_owner_access" on public.order_items;
 create policy "order_items_owner_access" on public.order_items
 for all
@@ -488,7 +437,6 @@ with check (
   )
 );
 
--- Payments: owner read, admin read/write; inserts typically by server
 drop policy if exists "payments_owner_read" on public.payments;
 create policy "payments_owner_read" on public.payments
 for select
@@ -507,7 +455,6 @@ for all
 using (public.is_admin())
 with check (public.is_admin());
 
--- Testimonials / Amazon reviews: public read, admin write
 drop policy if exists "testimonials_public_read" on public.testimonials;
 create policy "testimonials_public_read" on public.testimonials
 for select using (true);
@@ -528,7 +475,6 @@ for all
 using (public.is_admin())
 with check (public.is_admin());
 
--- Analytics: allow inserts from anyone, admin-only reads
 drop policy if exists "analytics_events_insert_anyone" on public.analytics_events;
 create policy "analytics_events_insert_anyone" on public.analytics_events
 for insert
@@ -539,7 +485,6 @@ create policy "analytics_events_admin_read" on public.analytics_events
 for select
 using (public.is_admin());
 
--- Chatbot: allow inserts from anyone, admin-only reads
 drop policy if exists "chatbot_sessions_insert_anyone" on public.chatbot_sessions;
 create policy "chatbot_sessions_insert_anyone" on public.chatbot_sessions
 for insert
@@ -561,4 +506,5 @@ for select
 using (public.is_admin());
 
 commit;
+
 

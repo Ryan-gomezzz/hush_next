@@ -1,5 +1,5 @@
--- Hush Gentle Ecommerce - Seed data (public)
--- Safe to run multiple times thanks to ON CONFLICT clauses.
+-- Canonical Supabase seed entrypoint for Hush Gentle Ecommerce.
+-- Mirrors `db/seed.sql` so Supabase dashboard setup can point here.
 
 begin;
 
@@ -14,7 +14,6 @@ set name = excluded.name,
     description = excluded.description,
     updated_at = now();
 
--- Products (minimal, brand-aligned, no medical claims)
 insert into public.products (
   category_id, name, slug, description, price_cents, currency, image_url,
   is_active, inventory_count, ingredients, usage
@@ -71,7 +70,6 @@ set name = excluded.name,
     usage = excluded.usage,
     updated_at = now();
 
--- Testimonials
 insert into public.testimonials (name, content, rating, is_approved)
 values
   ('Aarohi', 'The textures feel calm and simple—my routine finally feels lightweight.', 5, true),
@@ -79,7 +77,6 @@ values
   ('Sana', 'Cleanses without that tight feeling. Really enjoying it.', 4, true)
 on conflict do nothing;
 
--- Amazon-style reviews (sample)
 insert into public.amazon_reviews (asin, author, rating, title, content, review_date)
 values
   ('B0HUSHGENT1', 'Verified Buyer', 5, 'Soft finish', 'Feels gentle and leaves skin comfortable.', current_date - interval '10 days'),
@@ -88,4 +85,5 @@ values
 on conflict do nothing;
 
 commit;
+
 
