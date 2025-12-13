@@ -1,5 +1,5 @@
 -- Helper functions for inventory management
--- These functions are used by Netlify Functions for atomic operations
+-- These functions are used by Next.js API routes for atomic operations
 
 -- Function to increment reserved inventory
 CREATE OR REPLACE FUNCTION increment_reserved(

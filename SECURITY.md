@@ -280,7 +280,7 @@ const query = `SELECT * FROM products WHERE slug = '${userInput}'`;
 ### If Service Role Key is Compromised
 
 1. **Immediately**: Rotate key in Supabase dashboard
-2. **Update**: Environment variable in Netlify
+2. **Update**: Environment variable in Vercel
 3. **Redeploy**: Application
 4. **Audit**: Review access logs for unauthorized access
 5. **Notify**: Affected users if data was accessed

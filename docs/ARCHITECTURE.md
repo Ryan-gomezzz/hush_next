@@ -169,13 +169,13 @@ Admin → Admin Panel → Next.js API Route (/api/chatbot/ingest)
 - Admin: Full access to all tables
 
 **API Authorization**:
-- Netlify Functions check admin role before privileged operations
+- Next.js API routes check admin role before privileged operations
 - Service role key only used server-side
 
 ### Data Protection
 
 - Service role key never exposed to client
-- API keys stored in Netlify environment variables
+- API keys stored in Vercel environment variables
 - RLS policies enforce database-level access control
 - Input validation on all API endpoints
 

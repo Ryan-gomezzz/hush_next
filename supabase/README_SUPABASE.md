@@ -93,7 +93,7 @@ FOR INSERT WITH CHECK (
 ### Key Usage
 
 - **anon key**: Client-side operations (browser)
-- **service_role key**: Server-side only (Netlify Functions)
+- **service_role key**: Server-side only (Next.js API routes)
 - **Never expose service_role key to client!**
 
 ## Database Management
