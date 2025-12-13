@@ -1,165 +1,111 @@
-# ================================
-# Cursor Rules for Hush Gentle
-# Full-Stack E-Commerce Platform
-# ================================
+# ==================================
+# Cursor Rules — Hush Gentle Website
+# Model-Agnostic, Discipline-First
+# ==================================
 
 version: 1.0
 
 project:
   name: hush-gentle-ecommerce
   domain: organic-cosmetics
-  stage: production-mvp
+  goal: production-ready-mvp
   principles:
-    - low-maintenance
-    - security-first
-    - minimalistic-ui
-    - founder-friendly
-    - scalable-without-refactor
+    - simplicity_over_complexity
+    - low_maintenance
+    - security_first
+    - ux_first
+    - scalability_without_refactor
 
-# --------------------------------
+# ----------------------------------
 # GLOBAL EXECUTION RULES
-# --------------------------------
+# ----------------------------------
 global:
   max_mode: true
-  allow_auto_model_switching: false
   use_multiple_models: true
+  auto_model_selection_allowed: true
   enforce_stepwise_execution: true
-  no_hallucinated_dependencies: true
-  prefer_explicit_over_implicit: true
-  avoid_overengineering: true
 
-  mandatory_output_order:
-    - architecture
-    - file_structure
+  mandatory_execution_order:
+    - requirements_understanding
+    - architecture_definition
+    - file_structure_confirmation
     - database_schema
     - backend_logic
-    - frontend_components
+    - frontend_ui
     - admin_dashboard
     - analytics
     - ai_chatbot
-    - security_review
-    - setup_instructions
+    - security_validation
+    - final_verification
 
-# --------------------------------
-# MODEL ROLE ASSIGNMENTS
-# --------------------------------
-models:
+  prohibitions:
+    - skipping_architecture
+    - rewriting_working_code
+    - hallucinated_integrations
+    - unnecessary_dependencies
+    - overengineering
 
-  architect:
-    model: GPT-5.2
-    responsibilities:
-      - system_architecture
-      - database_schema_design
-      - supabase_rls_policies
-      - authentication_flows
-      - analytics_strategy
-      - payment_abstraction_design
-    constraints:
-      - must_reason_before_code
-      - must_define_tradeoffs
-      - no_ui_code
-      - no_placeholder_logic
-    output_style:
-      verbosity: high
-      format: markdown
-      include_diagrams: true
+# ----------------------------------
+# QUALITY & SAFETY RULES
+# ----------------------------------
+quality:
+  requirements:
+    - explicit_assumptions
+    - clear_tradeoffs
+    - minimal_magic
+    - readable_code
+    - strong_typing_where_applicable
+  validation:
+    - explain_before_build
+    - check_against_spec
+    - confirm_completeness
 
-  builder:
-    model: GPT-5.1 Codex Max
-    responsibilities:
-      - nextjs_app_router
-      - api_routes
-      - server_actions
-      - supabase_queries
-      - typescript_types
-      - backend_validation
-    constraints:
-      - follow_architect_decisions
-      - no_schema_changes_without_approval
-      - strict_typescript
-      - no_experimental_nextjs_features
-    output_style:
-      verbosity: medium
-      format: code-first
-      tests: optional
-
-  designer:
-    model: Claude Opus 4.5
-    responsibilities:
-      - react_components
-      - tailwind_css
-      - ui_layout
-      - accessibility_basics
-      - microcopy
-      - branding_tone
-    constraints:
-      - no_backend_logic
-      - no_database_access
-      - follow_design_tokens
-      - pastel_palette_only
-    output_style:
-      verbosity: medium
-      format: jsx-tsx
-      focus: aesthetics
-
-  orchestrator:
-    model: Composer 1
-    responsibilities:
-      - task_decomposition
-      - agent_coordination
-      - consistency_checks
-      - conflict_resolution
-      - step_progression
-    constraints:
-      - must_assign_tasks_explicitly
-      - must_validate_outputs
-      - stop_if_requirements_conflict
-    output_style:
-      verbosity: low
-      format: checklist
-
-# --------------------------------
+# ----------------------------------
 # FRONTEND RULES
-# --------------------------------
+# ----------------------------------
 frontend:
   framework: react
-  router: nextjs-app-router
+  environment: nextjs_app_router
   styling: tailwindcss
-  ui_principles:
+  principles:
+    - minimalistic
+    - pastel_theme
     - high_whitespace
     - calm_interactions
-    - minimal_motion
     - mobile_first
-    - accessible_contrast
-  forbidden:
-    - inline_css
-    - heavy_animation_libraries
-    - unnecessary_client_components
+  constraints:
+    - no_inline_css
+    - avoid_heavy_animation
+    - minimize_client_components
+    - accessibility_basics_required
 
-# --------------------------------
+# ----------------------------------
 # BACKEND RULES
-# --------------------------------
+# ----------------------------------
 backend:
   framework: nextjs
-  api_style: route_handlers
-  auth: supabase_auth
-  rules:
-    - all_routes_authenticated_by_default
-    - admin_routes_role_protected
-    - validate_all_inputs
-    - no_business_logic_in_components
+  api_style: route_handlers_or_server_actions
+  authentication: supabase_auth
+  principles:
+    - secure_by_default
+    - server_side_validation
+    - clear_error_handling
+  constraints:
+    - no_business_logic_in_ui
+    - no_client_side_auth_checks
+    - no_direct_db_access_from_client
 
-# --------------------------------
+# ----------------------------------
 # DATABASE RULES
-# --------------------------------
+# ----------------------------------
 database:
   provider: supabase
   engine: postgresql
-  rules:
+  requirements:
     - rls_enabled_on_all_tables
-    - indexes_on_foreign_keys
-    - no_denormalization_without_reason
-    - audit_fields_required
+    - foreign_key_constraints
+    - indexes_on_relations
+    - audit_columns
   mandatory_tables:
     - users
     - profiles
@@ -177,60 +123,82 @@ database:
     - chatbot_sessions
     - chatbot_messages
 
-# --------------------------------
-# AI CHATBOT RULES
-# --------------------------------
-ai_chatbot:
-  personality:
-    tone: gentle
-    style: calm
-    avoid:
-      - medical_claims
-      - aggressive_sales
-  requirements:
-    - provider_agnostic
-    - configurable_system_prompt
-    - conversation_logging
-    - graceful_fallbacks
-
-# --------------------------------
+# ----------------------------------
 # ANALYTICS RULES
-# --------------------------------
+# ----------------------------------
 analytics:
-  strategy: internal_events
-  rules:
-    - no_third_party_paid_tools
-    - event_based_tracking
-    - daily_aggregation
-    - admin_visualization_ready
+  approach: internal_event_tracking
+  constraints:
+    - no_paid_third_party_tools
+    - privacy_respecting
+    - admin_visible_metrics
+  required_metrics:
+    - page_views
+    - add_to_cart
+    - checkout_started
+    - checkout_completed
+    - checkout_abandoned
+    - payment_success
+    - payment_failure
 
-# --------------------------------
+# ----------------------------------
+# AI CHATBOT RULES
+# ----------------------------------
+ai_chatbot:
+  tone:
+    - gentle
+    - calm
+    - informative
+  constraints:
+    - no_medical_claims
+    - no_aggressive_sales
+    - provider_agnostic
+    - conversation_logging_required
+
+# ----------------------------------
+# ADMIN DASHBOARD RULES
+# ----------------------------------
+admin:
+  target_user: non_technical_single_founder
+  principles:
+    - simple_language
+    - minimal_controls
+    - visual_feedback
+  required_features:
+    - product_management
+    - order_overview
+    - analytics_dashboard
+    - testimonial_management
+    - amazon_review_management
+
+# ----------------------------------
 # SECURITY RULES
-# --------------------------------
+# ----------------------------------
 security:
   principles:
     - least_privilege
-    - zero_trust
     - secure_defaults
+    - zero_trust
   mandatory:
     - rls_policies
-    - admin_role_checks
-    - server_side_validation
-    - no_secrets_in_client
+    - role_based_access
+    - input_validation
+    - secret_isolation
   forbidden:
-    - client_side_auth_logic
     - public_admin_routes
+    - secrets_in_client_code
 
-# --------------------------------
+# ----------------------------------
 # FAILURE CONDITIONS
-# --------------------------------
+# ----------------------------------
 failure_conditions:
-  - skipping_architecture_phase
-  - modifying_schema_without_architect
-  - mixing_ui_and_backend_logic
-  - hallucinated_integrations
+  - missing_core_features
+  - incomplete_schema
+  - broken_auth_flow
+  - admin_access_leak
   - violating_brand_tone
+  - excessive_manual_maintenance
 
-# ================================
+# ==================================
 # END OF CURSOR RULES
-# ================================
+# ==================================
