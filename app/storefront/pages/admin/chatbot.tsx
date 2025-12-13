@@ -19,7 +19,7 @@ export default function AdminChatbot() {
     setLoading(true);
 
     try {
-      const response = await fetch('/.netlify/functions/chatbot-query', {
+      const response = await fetch('/api/chatbot/query', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -46,7 +46,7 @@ export default function AdminChatbot() {
 
     setIngesting(true);
     try {
-      const response = await fetch('/.netlify/functions/ingest-embeddings', {
+      const response = await fetch('/api/chatbot/ingest', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

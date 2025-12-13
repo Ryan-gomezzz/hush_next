@@ -157,7 +157,7 @@ This means Supabase is not configured. Check:
 
 ## Next Steps
 
-- Deploy to Netlify (see `docs/DEPLOYMENT.md`)
+- Deploy to Vercel (see `docs/DEPLOYMENT.md`)
 - Set up custom domain
 - Configure email notifications
 - Add payment gateway integration

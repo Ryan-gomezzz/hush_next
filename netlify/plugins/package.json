@@ -1,9 +1,0 @@
-{
-  "name": "netlify-plugins",
-  "version": "1.0.0",
-  "private": true,
-  "dependencies": {
-    "@netlify/plugin-nextjs": "^4.39.0"
-  }
-}
-

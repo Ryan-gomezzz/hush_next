@@ -1,45 +1,25 @@
-import { Handler } from '@netlify/functions';
-import { createClient } from '@supabase/supabase-js';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { createServerSupabaseClient, getCorsHeaders } from '@/lib/apiHelpers';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-  },
-});
-
-export const handler: Handler = async (event, context) => {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Content-Type': 'application/json',
-  };
-
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    return res.status(200).end();
   }
 
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method not allowed' }),
-    };
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { user_id, items, total_cents, coupon_id, shipping } = JSON.parse(event.body || '{}');
+    const supabase = createServerSupabaseClient();
+    const { user_id, items, total_cents, coupon_id, shipping } = req.body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Cart is empty' }),
-      };
+      return res.status(400).json({ error: 'Cart is empty' });
     }
 
     // Check inventory and reserve items
@@ -51,24 +31,16 @@ export const handler: Handler = async (event, context) => {
         .single();
 
       if (invError || !inventory) {
-        return {
-          statusCode: 400,
-          headers,
-          body: JSON.stringify({ error: `Product ${item.product_id} not found in inventory` }),
-        };
+        return res.status(400).json({ error: `Product ${item.product_id} not found in inventory` });
       }
 
       const available = inventory.qty - inventory.reserved;
       if (available < item.qty) {
-        return {
-          statusCode: 400,
-          headers,
-          body: JSON.stringify({ error: `Insufficient stock for ${item.name}` }),
-        };
+        return res.status(400).json({ error: `Insufficient stock for ${item.name}` });
       }
     }
 
-    // Create order in transaction
+    // Create order
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
@@ -134,18 +106,12 @@ export const handler: Handler = async (event, context) => {
       });
     }
 
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ order }),
-    };
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    return res.status(200).json({ order });
   } catch (error: any) {
-    console.error('Error in checkout function:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: error.message }),
-    };
+    console.error('Error in checkout API:', error);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    return res.status(500).json({ error: error.message });
   }
-};
+}
 

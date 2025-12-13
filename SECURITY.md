@@ -15,7 +15,7 @@ This document outlines security best practices implemented in the SOYL Supabase 
 ### Admin Authorization
 
 - **Role-Based Access**: Admin users have `role = 'admin'` in `profiles` table
-- **Server-Side Verification**: All admin operations verify role in Netlify Functions
+- **Server-Side Verification**: All admin operations verify role in Next.js API routes
 - **Database Function**: `is_admin()` checks user role via RLS
 
 ```sql
@@ -29,7 +29,7 @@ $$ LANGUAGE SQL STABLE;
 
 ### API Security
 
-- **Service Role Key**: Only used in server-side Netlify Functions
+- **Service Role Key**: Only used in server-side Next.js API routes
 - **Never Exposed**: Service role key never sent to client
 - **Token Verification**: All admin endpoints verify JWT token
 
@@ -85,7 +85,7 @@ Never exposed to client:
 
 ### Storage
 
-- **Netlify**: Store in Netlify dashboard → Environment variables
+- **Vercel**: Store in Vercel dashboard → Environment variables
 - **Local**: Use `.env.local` (gitignored)
 - **Never Commit**: Add to `.gitignore`
 
@@ -99,7 +99,7 @@ Never exposed to client:
 
 ### Server-Side
 
-- Validate all inputs in Netlify Functions
+- Validate all inputs in Next.js API routes
 - Sanitize user input
 - Type checking with TypeScript
 - SQL injection prevention (Supabase client handles this)
@@ -169,7 +169,7 @@ async headers() {
 ### Rotation Process
 
 1. Generate new key in Supabase dashboard
-2. Update environment variable in Netlify
+2. Update environment variable in Vercel
 3. Redeploy application
 4. Revoke old key after verification
 
@@ -222,7 +222,7 @@ const query = `SELECT * FROM products WHERE slug = '${userInput}'`;
 ## CSRF Protection
 
 - **SameSite Cookies**: Supabase Auth uses SameSite cookies
-- **CORS**: Configured in Netlify Functions
+- **CORS**: Configured in Next.js API routes
 - **Origin Validation**: Verify request origin (optional)
 
 ## Data Privacy
@@ -263,13 +263,13 @@ const query = `SELECT * FROM products WHERE slug = '${userInput}'`;
 ## Checklist for Production
 
 - [ ] All RLS policies enabled and tested
-- [ ] Service role key secured in Netlify (never in Git)
+- [ ] Service role key secured in Vercel (never in Git)
 - [ ] Admin passwords are strong and rotated
 - [ ] Security headers configured
 - [ ] Rate limiting implemented
 - [ ] Input validation on all endpoints
 - [ ] Error messages don't leak sensitive info
-- [ ] HTTPS enforced (Netlify auto-provisions)
+- [ ] HTTPS enforced (Vercel auto-provisions)
 - [ ] Database backups configured (Supabase)
 - [ ] Monitoring and alerts set up
 - [ ] Security audit completed

@@ -29,7 +29,7 @@ else
     echo "   - $var"
   done
   echo ""
-  echo "Please set these in your .env.local file or Netlify environment variables"
+  echo "Please set these in your .env.local file or Vercel environment variables"
   exit 1
 fi
 

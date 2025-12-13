@@ -45,7 +45,7 @@ export default function Checkout() {
     if (!couponCode) return;
 
     try {
-      const response = await fetch('/.netlify/functions/coupons', {
+      const response = await fetch('/api/coupons', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -96,8 +96,8 @@ export default function Checkout() {
 
       const totals = calculateTotal();
 
-      // Create order via Netlify Function
-      const response = await fetch('/.netlify/functions/checkout', {
+      // Create order via API
+      const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

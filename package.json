@@ -1,7 +1,7 @@
 {
   "name": "soyl-supabase-demo",
   "version": "1.0.0",
-  "description": "Supabase + Next.js + Netlify ecommerce demo (cosmetics)",
+  "description": "Supabase + Next.js + Vercel ecommerce demo (cosmetics)",
   "private": true,
   "scripts": {
     "dev": "cd app/storefront && npm run dev",
@@ -15,14 +15,13 @@
   "keywords": [
     "nextjs",
     "supabase",
-    "netlify",
+    "vercel",
     "ecommerce",
     "cosmetics"
   ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@netlify/plugin-nextjs": "^4.39.0",
     "@types/node": "^20.10.0",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",

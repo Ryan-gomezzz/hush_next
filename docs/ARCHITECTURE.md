@@ -14,9 +14,9 @@ The SOYL Supabase Ecommerce Demo is a full-stack ecommerce application with the 
          │                 │
          ▼                 ▼
 ┌─────────────────┐  ┌─────────────────┐
-│  Supabase       │  │  Netlify        │
-│  (Database +    │  │  Functions      │
-│   Auth +        │  │  (Server APIs)  │
+│  Supabase       │  │  Vercel         │
+│  (Database +    │  │  (Next.js API   │
+│   Auth +        │  │   Routes)       │
 │   Storage)      │  │                 │
 └────────┬────────┘  └────────┬────────┘
          │                    │
@@ -71,22 +71,22 @@ The SOYL Supabase Ecommerce Demo is a full-stack ecommerce application with the 
 - **Storage**: Product images and file uploads
 - **Realtime**: (Optional) Real-time updates for inventory/orders
 
-### 3. Netlify Functions
+### 3. Next.js API Routes
 
-Serverless functions for server-side operations:
+Server-side API endpoints in `app/storefront/pages/api/`:
 
 - `products.ts` - Product CRUD (admin only)
 - `checkout.ts` - Order creation with inventory reservation
 - `coupons.ts` - Coupon validation and management
-- `admin-metrics.ts` - Analytics queries (admin only)
-- `chatbot-query.ts` - RAG chatbot endpoint
-- `ingest-embeddings.ts` - Document ingestion (admin only)
+- `admin/metrics.ts` - Analytics queries (admin only)
+- `chatbot/query.ts` - RAG chatbot endpoint
+- `chatbot/ingest.ts` - Document ingestion (admin only)
 
-**Why Netlify Functions?**
-- Isolated server-side execution
+**Why Next.js API Routes?**
+- Integrated with Next.js framework
 - Access to service role key (never exposed to client)
-- Automatic scaling
-- Built-in rate limiting
+- Automatic scaling via Vercel serverless functions
+- Built-in TypeScript support
 
 ### 4. Supabase Edge Functions
 
@@ -95,7 +95,7 @@ Optional Deno-based functions for embedding operations:
 - `ingest_embeddings.js` - Document ingestion with chunking
 - `chatbot_query.js` - RAG query with vector search
 
-**Note**: Currently using Netlify Functions, but Edge Functions are available as alternative.
+**Note**: Next.js API routes are deployed as Vercel serverless functions automatically.
 
 ## Data Flow
 
@@ -112,7 +112,7 @@ User → Next.js Page → Supabase Client (anon key)
 ### Checkout Flow
 
 ```
-User → Checkout Page → Netlify Function (checkout.ts)
+User → Checkout Page → Next.js API Route (/api/checkout)
                     → Verify inventory (service role)
                     → Create order (RLS: authenticated)
                     → Reserve inventory
@@ -123,7 +123,7 @@ User → Checkout Page → Netlify Function (checkout.ts)
 ### Admin Product Management
 
 ```
-Admin → Admin Page → Netlify Function (products.ts)
+Admin → Admin Page → Next.js API Route (/api/products)
                   → Verify admin role (service role)
                   → CRUD operations (RLS: admin only)
                   → Update Supabase Storage (images)
@@ -133,7 +133,7 @@ Admin → Admin Page → Netlify Function (products.ts)
 ### Chatbot RAG Flow
 
 ```
-User → Chatbot UI → Netlify Function (chatbot-query.ts)
+User → Chatbot UI → Next.js API Route (/api/chatbot/query)
                   → Create query embedding (OpenAI)
                   → Vector search in embeddings table (pgvector)
                   → Retrieve top-K similar documents
@@ -145,7 +145,7 @@ User → Chatbot UI → Netlify Function (chatbot-query.ts)
 ### Document Ingestion Flow
 
 ```
-Admin → Admin Panel → Netlify Function (ingest-embeddings.ts)
+Admin → Admin Panel → Next.js API Route (/api/chatbot/ingest)
                    → Verify admin role
                    → Chunk document text
                    → Create embeddings (OpenAI, batch)
@@ -158,7 +158,7 @@ Admin → Admin Panel → Netlify Function (ingest-embeddings.ts)
 ### Authentication
 
 1. **Client-side**: Supabase Auth handles login/signup
-2. **Server-side**: JWT tokens verified in Netlify Functions
+2. **Server-side**: JWT tokens verified in Next.js API routes
 3. **Admin check**: Profile role verified via `is_admin()` function
 
 ### Authorization
@@ -250,8 +250,8 @@ REFRESH MATERIALIZED VIEW daily_conversion;
 ### Application
 
 - Next.js ISR for product pages (cache static content)
-- Netlify Functions auto-scale
-- CDN for static assets (Netlify)
+- Vercel serverless functions auto-scale
+- CDN for static assets (Vercel Edge Network)
 
 ### Embeddings
 
@@ -264,14 +264,14 @@ REFRESH MATERIALIZED VIEW daily_conversion;
 1. **Database Indexes**: All foreign keys and frequently queried columns indexed
 2. **Vector Index**: ivfflat index for fast ANN search
 3. **Caching**: Next.js static generation for product pages
-4. **CDN**: Netlify CDN for static assets
+4. **CDN**: Vercel Edge Network for static assets
 5. **Batch Operations**: Embeddings created in batches to avoid rate limits
 
 ## Monitoring & Observability
 
 ### Logs
 
-- **Netlify**: Function logs, build logs
+- **Vercel**: Function logs, build logs
 - **Supabase**: Database logs, API logs, auth logs
 - **OpenAI**: API usage dashboard
 
@@ -300,7 +300,7 @@ REFRESH MATERIALIZED VIEW daily_conversion;
 
 - **Next.js**: SSR/SSG, excellent DX, built-in optimizations
 - **Supabase**: Managed Postgres, Auth, Storage, RLS built-in
-- **Netlify**: Easy deployment, serverless functions, CDN
+- **Vercel**: Easy deployment, serverless functions, Edge Network
 - **OpenAI**: High-quality embeddings and chat completions
 - **pgvector**: Native Postgres vector search, no external service needed
 - **TypeScript**: Type safety, better DX, fewer runtime errors

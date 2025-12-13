@@ -3,7 +3,7 @@ module.exports = {
   roots: ['<rootDir>/__tests__'],
   testMatch: ['**/*.test.js'],
   collectCoverageFrom: [
-    'netlify/functions/**/*.ts',
+    'app/storefront/pages/api/**/*.ts',
     'supabase/seed/**/*.js',
     '!**/node_modules/**',
   ],

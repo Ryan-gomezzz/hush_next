@@ -1,6 +1,6 @@
 # SOYL Supabase Ecommerce Demo
 
-A complete ecommerce demo application built with Next.js, Supabase, and Netlify. Features a customer storefront, admin panel, and AI-powered chatbot with RAG (Retrieval Augmented Generation).
+A complete ecommerce demo application built with Next.js, Supabase, and Vercel. Features a customer storefront, admin panel, and AI-powered chatbot with RAG (Retrieval Augmented Generation).
 
 ## Features
 
@@ -14,7 +14,7 @@ A complete ecommerce demo application built with Next.js, Supabase, and Netlify.
 
 - **Frontend**: Next.js 14 (TypeScript), Tailwind CSS
 - **Backend**: Supabase (Postgres + Auth + Storage + pgvector)
-- **Hosting**: Netlify (Next.js + Netlify Functions)
+- **Hosting**: Vercel (Next.js + Serverless Functions)
 - **AI**: OpenAI (embeddings + chat completions)
 - **Database**: PostgreSQL with pgvector extension
 
@@ -25,7 +25,7 @@ A complete ecommerce demo application built with Next.js, Supabase, and Netlify.
 - Node.js 20+
 - Supabase account (free tier works)
 - OpenAI API key
-- Netlify account (for deployment)
+- Vercel account (for deployment)
 
 ### Local Development
 
@@ -36,7 +36,6 @@ git clone <repo-url>
 cd soyl-supabase-demo
 npm install
 cd app/storefront && npm install
-cd ../../netlify/functions && npm install
 ```
 
 2. **Set up Supabase**
@@ -96,8 +95,7 @@ soyl-supabase-demo/
 │   ├── migrations/         # SQL migrations
 │   ├── functions/          # Supabase Edge Functions
 │   └── seed/               # Seed scripts
-├── netlify/
-│   └── functions/          # Netlify Functions (server-side APIs)
+├── app/storefront/pages/api/  # Next.js API routes (server-side APIs)
 ├── scripts/                # Utility scripts
 └── docs/                   # Documentation
 ```
@@ -106,10 +104,11 @@ soyl-supabase-demo/
 
 See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for detailed deployment instructions.
 
-### Quick Deploy to Netlify
+### Quick Deploy to Vercel
 
-1. Connect your GitHub repository to Netlify
-2. Set environment variables in Netlify dashboard:
+1. Connect your GitHub repository to Vercel
+2. Set Root Directory to `app/storefront` in Vercel project settings
+3. Set environment variables in Vercel dashboard:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY` (server-only)
@@ -182,7 +181,7 @@ If you see errors about the `vector` extension:
 
 - Verify `OPENAI_API_KEY` is set correctly
 - Check that embeddings have been ingested (admin panel)
-- Review Netlify function logs for errors
+- Review Vercel function logs for errors
 
 ### RLS policy errors
 

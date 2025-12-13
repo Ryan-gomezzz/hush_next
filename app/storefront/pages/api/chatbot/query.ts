@@ -1,17 +1,11 @@
-import { Handler } from '@netlify/functions';
-import { createClient } from '@supabase/supabase-js';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { createServerSupabaseClient, getCorsHeaders } from '@/lib/apiHelpers';
 import OpenAI from 'openai';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const openaiApiKey = process.env.OPENAI_API_KEY!;
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-  },
-});
+const openaiApiKey = process.env.OPENAI_API_KEY;
+if (!openaiApiKey) {
+  throw new Error('OPENAI_API_KEY is not set');
+}
 
 const openai = new OpenAI({ apiKey: openaiApiKey });
 
@@ -34,45 +28,39 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
-export const handler: Handler = async (event, context) => {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Content-Type': 'application/json',
-  };
-
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    return res.status(200).end();
   }
 
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method not allowed' }),
-    };
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
+
+  const headers = getCorsHeaders('POST, OPTIONS');
+  Object.entries(headers).forEach(([key, value]) => {
+    res.setHeader(key, value);
+  });
 
   try {
     // Rate limiting
-    const clientIP = event.headers['x-forwarded-for'] || event.headers['x-real-ip'] || 'unknown';
-    if (!checkRateLimit(clientIP as string)) {
-      return {
-        statusCode: 429,
-        headers,
-        body: JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
-      };
+    const clientIP = (req.headers['x-forwarded-for'] as string) || 
+                     (req.headers['x-real-ip'] as string) || 
+                     req.socket.remoteAddress || 
+                     'unknown';
+    
+    if (!checkRateLimit(clientIP)) {
+      return res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
     }
 
-    const { message, session_id, top_k = 5 } = JSON.parse(event.body || '{}');
+    const { message, session_id, top_k = 5 } = req.body;
 
     if (!message || typeof message !== 'string') {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Missing or invalid message' }),
-      };
+      return res.status(400).json({ error: 'Missing or invalid message' });
     }
 
     // Create embedding for user query
@@ -84,7 +72,7 @@ export const handler: Handler = async (event, context) => {
     const queryEmbedding = embeddingResponse.data[0].embedding;
 
     // Vector search in embeddings table
-    // Use the match_embeddings function if available, otherwise fallback
+    const supabase = createServerSupabaseClient();
     const { data: similarDocs, error: searchError } = await supabase.rpc('match_embeddings', {
       query_embedding: `[${queryEmbedding.join(',')}]`,
       match_threshold: 0.7,
@@ -138,26 +126,18 @@ If you don't know something, say so honestly.`;
       },
     }).catch(err => console.error('Failed to log event:', err));
 
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({
-        answer,
-        suggestions: productIds,
-        sources: contextDocs.map((doc: any) => ({
-          doc_type: doc.doc_type,
-          doc_id: doc.doc_id,
-          preview: doc.content.substring(0, 100) + '...',
-        })),
-      }),
-    };
+    return res.status(200).json({
+      answer,
+      suggestions: productIds,
+      sources: contextDocs.map((doc: any) => ({
+        doc_type: doc.doc_type,
+        doc_id: doc.doc_id,
+        preview: doc.content.substring(0, 100) + '...',
+      })),
+    });
   } catch (error: any) {
-    console.error('Error in chatbot-query function:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: error.message }),
-    };
+    console.error('Error in chatbot-query API:', error);
+    return res.status(500).json({ error: error.message });
   }
-};
+}
 
